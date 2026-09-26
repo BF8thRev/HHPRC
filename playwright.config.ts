@@ -1,12 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 4173;
+const CI = !!process.env.CI;
 
 export default defineConfig({
   testDir: "./e2e",
-  forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
+  forbidOnly: CI,
+  retries: CI ? 1 : 0,
+  // Fail fast instead of hanging a CI runner.
+  globalTimeout: CI ? 5 * 60_000 : undefined,
+  reporter: CI ? [["list"], ["github"], ["html", { open: "never" }]] : "list",
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "retain-on-failure",
@@ -17,9 +20,14 @@ export default defineConfig({
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
   ],
   webServer: {
-    command: `pnpm db:migrate:local && pnpm preview --port ${PORT} --strictPort`,
+    // CI builds and migrates in earlier steps, then starts Vite directly (no
+    // pnpm/sh wrappers) so Playwright can stop the server cleanly on Linux.
+    command: CI
+      ? `node node_modules/vite/bin/vite.js preview --port ${PORT} --strictPort`
+      : `pnpm db:migrate:local && pnpm preview --port ${PORT} --strictPort`,
     url: `http://localhost:${PORT}/healthz`,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !CI,
     timeout: 180_000,
+    gracefulShutdown: { signal: "SIGTERM", timeout: 5_000 },
   },
 });
