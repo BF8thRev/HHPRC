@@ -53,7 +53,18 @@ jobs:
       - name: Upload preview version
         id: upload
         run: |
-          pnpm exec wrangler versions upload --preview-alias "pr-${{ github.event.pull_request.number }}" | tee upload.log
+          set -o pipefail
+          upload() {
+            pnpm exec wrangler versions upload --preview-alias "pr-${{ github.event.pull_request.number }}" 2>&1 | tee upload.log
+          }
+          if ! upload; then
+            # Versions can only be uploaded to a Worker that exists; the very
+            # first preview creates hhprc-preview with a normal deploy.
+            grep -q "does not yet exist" upload.log || exit 1
+            echo "Creating the hhprc-preview Worker"
+            pnpm exec wrangler deploy
+            upload
+          fi
           url=$(grep -oE 'https://pr-[^ ]+\.workers\.dev' upload.log | head -1)
           if [ -z "$url" ]; then
             echo "::error::No preview URL in Wrangler output. Is a workers.dev subdomain registered for the account?"
