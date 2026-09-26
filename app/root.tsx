@@ -8,6 +8,9 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
+import { SiteFooter } from "./components/SiteFooter";
+import { SiteHeader } from "./components/SiteHeader";
+import { TemplateBanner } from "./components/ui";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -28,8 +31,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="flex min-h-dvh flex-col">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:flex focus:items-center focus:rounded-full focus:bg-white focus:px-4 focus:font-semibold focus:text-deep"
+        >
+          Skip to main content
+        </a>
+        <TemplateBanner />
+        <SiteHeader />
+        <main id="main" className="flex-1">
+          {children}
+        </main>
+        <SiteFooter />
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -58,7 +72,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   }
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-12">
+    <div className="mx-auto max-w-2xl px-4 py-12">
       <h1 className="font-display text-3xl font-extrabold">{heading}</h1>
       <p className="mt-4">{details}</p>
       {stack && (
@@ -66,6 +80,6 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
           <code>{stack}</code>
         </pre>
       )}
-    </main>
+    </div>
   );
 }
