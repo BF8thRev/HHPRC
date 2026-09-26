@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+/* Design tokens — "A summer day at the club." Editors never change these. */
+@theme {
+  --color-pool: #0ea5e9;
+  --color-pool-text: #0369a1; /* pool blue darkened to pass AA as text on sand */
+  --color-deep: #0c4a6e;
+  --color-sun: #facc15;
+  --color-coral: #f97316;
+  --color-alert: #dc2626; /* alerts only */
+  --color-grass: #16a34a;
+  --color-sand: #fff7ed;
+
+  --font-display: "Nunito", ui-rounded, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* 17px minimum body text */
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.6;
+}
+
+@layer base {
+  html {
+    @apply bg-sand text-deep;
+  }
+
+  body {
+    @apply min-h-dvh font-sans text-base antialiased;
+  }
+
+  /* 44px minimum tap targets */
+  a,
+  button,
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+}
