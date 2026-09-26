@@ -55,10 +55,13 @@ jobs:
         run: |
           pnpm exec wrangler versions upload --preview-alias "pr-${{ github.event.pull_request.number }}" | tee upload.log
           url=$(grep -oE 'https://pr-[^ ]+\.workers\.dev' upload.log | head -1)
+          if [ -z "$url" ]; then
+            echo "::error::No preview URL in Wrangler output. Is a workers.dev subdomain registered for the account?"
+            exit 1
+          fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Comment preview URL
-        if: steps.upload.outputs.url != ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
