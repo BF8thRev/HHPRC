@@ -1,0 +1,40 @@
+// Cloudflare Worker config.
+// Top level = production (hhprc.club). `env.preview` = the hhprc-preview Worker used for
+// PR preview URLs; it has its own D1 database and never sees real member data.
+// Bindings are not inherited by environments, so anything added here must be repeated under env.preview.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hhprc",
+  "main": "./workers/app.ts",
+  "compatibility_date": "2026-08-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "upload_source_maps": true,
+  "vars": {
+    "APP_ENV": "production",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "hhprc-prod",
+      "database_id": "11c6c248-21c9-4260-a0d6-143e227c29b0",
+      "migrations_dir": "db/migrations",
+    },
+  ],
+  "env": {
+    "preview": {
+      "name": "hhprc-preview",
+      "vars": {
+        "APP_ENV": "preview",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "hhprc-preview",
+          "database_id": "032da43d-6681-4869-8d7e-acc62325479f",
+          "migrations_dir": "db/migrations",
+        },
+      ],
+    },
+  },
+}

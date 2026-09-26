@@ -1,0 +1,61 @@
+{
+  "name": "hhprc",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.6.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "postinstall": "pnpm run typegen",
+    "typegen": "wrangler types && react-router typegen",
+    "dev": "react-router dev",
+    "build": "react-router build",
+    "preview": "pnpm run build && vite preview",
+    "typecheck": "pnpm run typegen && tsc -b",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate:local": "wrangler d1 migrations apply DB --local",
+    "db:migrate:preview": "wrangler d1 migrations apply DB --remote --env preview",
+    "db:migrate:prod": "wrangler d1 migrations apply DB --remote",
+    "db:seed": "tsx db/seed.ts",
+    "deploy": "pnpm run build && wrangler deploy"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.45.3",
+    "isbot": "^5.2.2",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-router": "~7.18.4",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@cloudflare/vite-plugin": "^1.60.2",
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
+    "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.63.0",
+    "@react-router/dev": "~7.18.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "drizzle-kit": "^0.31.11",
+    "eslint": "^9.39.5",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.1",
+    "vite": "^8.3.1",
+    "vitest": "~4.1.11",
+    "wrangler": "^4.141.0"
+  }
+}

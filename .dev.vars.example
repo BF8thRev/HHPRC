@@ -1,0 +1,9 @@
+# Copy to .dev.vars for local development. Never commit .dev.vars.
+# Local dev overrides APP_ENV so emails are logged, never sent, and Stripe stays in test mode.
+APP_ENV=development
+
+# Added in later phases:
+# BETTER_AUTH_SECRET=
+# STRIPE_SECRET_KEY=sk_test_...
+# STRIPE_WEBHOOK_SECRET=whsec_...
+# TURNSTILE_SECRET_KEY=
