@@ -78,3 +78,33 @@ export function formatDateTime(instant: Date): string {
   const time = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
   return `${formatDay(date)} at ${formatTime(time)}`;
 }
+
+/** The instant a club wall-clock time happens, e.g. noon on opening day in New York. */
+export function clubInstant(date: IsoDate, time: ClockTime): Date {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  const wanted = Date.UTC(y, m - 1, d) + toMinutes(time) * 60_000;
+  // Start from the wall time read as UTC, then correct by New York's offset.
+  // Two passes settle it on either side of a daylight-saving change.
+  let guess = wanted;
+  for (let i = 0; i < 2; i++) {
+    const { date: gd, minutes } = partsOf(new Date(guess));
+    const [gy, gm, gdd] = gd.split("-").map(Number) as [number, number, number];
+    guess += wanted - (Date.UTC(gy, gm - 1, gdd) + minutes * 60_000);
+  }
+  return new Date(guess);
+}
+
+/** "Friday, February 26, 2027" style short date: "Feb 26". */
+export function formatShortDay(date: IsoDate): { month: string; day: number; weekday: string } {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  const at = new Date(Date.UTC(y, m - 1, d, 12));
+  const fmt = (opts: Intl.DateTimeFormatOptions) =>
+    new Intl.DateTimeFormat("en-US", { timeZone: "UTC", ...opts }).format(at);
+  return { month: fmt({ month: "short" }), day: d, weekday: fmt({ weekday: "short" }) };
+}
+
+/** "12 PM" for an instant, in club time. */
+export function formatClubTime(instant: Date): string {
+  const minutes = clubMinutes(instant);
+  return formatTime(`${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`);
+}

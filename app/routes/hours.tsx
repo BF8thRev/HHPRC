@@ -1,6 +1,6 @@
 import { Card, PageHeader, Section } from "../components/ui";
 import { club, hoursNotes, hoursSchedules, season } from "../content/sample";
-import { formatDay, formatTimeRange } from "../lib/dates";
+import { formatDay, formatTimeRange, weekdayOf } from "../lib/dates";
 import type { Route } from "./+types/hours";
 
 const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -11,6 +11,18 @@ export function meta(_: Route.MetaArgs) {
   return [{ title: `Pool hours | ${club.shortName}` }];
 }
 
+/** Weekdays that occur between two dates. A week or more covers them all. */
+function daysIn(start: string, end: string) {
+  const found = new Set<number>();
+  for (let d = start; d <= end && found.size < 7; d = nextDay(d)) found.add(weekdayOf(d));
+  return found;
+}
+
+function nextDay(date: string) {
+  const [y, m, d] = date.split("-").map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
+}
+
 export function loader() {
   return {
     openingDay: formatDay(season.openingDay),
@@ -18,7 +30,7 @@ export function loader() {
     schedules: hoursSchedules.map((s) => ({
       label: s.label,
       range: `${formatDay(s.startsOn)} to ${formatDay(s.endsOn)}`,
-      rows: ORDER.map((weekday) => {
+      rows: ORDER.filter((weekday) => daysIn(s.startsOn, s.endsOn).has(weekday)).map((weekday) => {
         const day = s.days.find((d) => d.weekday === weekday);
         return {
           day: WEEKDAYS[weekday]!,
@@ -36,6 +48,7 @@ export default function Hours({ loaderData }: Route.ComponentProps) {
       <PageHeader
         title="Pool hours"
         intro={`The ${season.name} season runs ${openingDay} through ${closingDay}.`}
+        image="/images/beachball.webp"
       />
       {schedules.map((s) => (
         <Section key={s.label} title={s.label}>
@@ -61,7 +74,7 @@ export default function Hours({ loaderData }: Route.ComponentProps) {
       ))}
       <Section title="Good to know">
         <ul className="list-disc space-y-2 pl-6">
-          {hoursNotes.map((note) => (
+          {Object.values(hoursNotes).map((note) => (
             <li key={note}>{note}</li>
           ))}
         </ul>

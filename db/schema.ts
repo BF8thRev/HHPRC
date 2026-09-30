@@ -8,3 +8,10 @@ export const appMeta = sqliteTable("app_meta", {
   value: text("value").notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
+
+// "Get club news by email" sign-ups from the public site. Just an address and
+// when it arrived; the email phase adds sending and unsubscribe.
+export const emailSignups = sqliteTable("email_signups", {
+  email: text("email").primaryKey(),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
