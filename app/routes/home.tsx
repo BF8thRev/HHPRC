@@ -124,7 +124,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
             </p>
           </Card>
 
-          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-sky-50">
+          <Card className="relative overflow-hidden bg-gradient-to-br from-white to-cyan-50">
             <div id="signup" className="scroll-mt-24">
               <p className="font-display font-bold text-coral-text">Stay in the loop</p>
               <h3 className="font-display text-2xl font-extrabold">Get club news by email</h3>
@@ -296,7 +296,7 @@ function Hero({
   closingDay,
 }: Route.ComponentProps["loaderData"]) {
   return (
-    <section className="relative overflow-hidden bg-deep text-white">
+    <section className="relative overflow-hidden bg-lagoon text-white">
       <picture>
         <source media="(min-width: 800px)" srcSet="/images/hero-1600.webp" />
         <img
@@ -307,7 +307,7 @@ function Hero({
         />
       </picture>
       {/* Darker on the text side so white type stays readable over bright water. */}
-      <div className="absolute inset-0 bg-gradient-to-b from-deep/75 via-deep/35 to-deep/60 lg:bg-gradient-to-r lg:from-deep/90 lg:via-deep/55 lg:to-deep/10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-lagoon/85 via-lagoon/45 to-lagoon/70 lg:bg-gradient-to-r lg:from-lagoon/95 lg:via-lagoon/60 lg:to-lagoon/10" />
 
       {/* Phone order: headline, countdown, then the rest. Desktop: text left, countdown right. */}
       <div className="relative mx-auto grid max-w-6xl gap-6 px-4 pt-6 pb-24 sm:pt-16 sm:pb-32 lg:grid-cols-[1fr_1.05fr] lg:gap-x-10 lg:gap-y-6">
@@ -321,7 +321,7 @@ function Hero({
           </h1>
         </div>
 
-        <div className="max-w-2xl rounded-3xl bg-deep/60 p-4 ring-1 ring-white/20 backdrop-blur-md sm:p-6 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+        <div className="max-w-2xl rounded-3xl bg-deep/55 p-4 ring-1 ring-white/25 backdrop-blur-md sm:p-6 lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
           {beforeOpening ? (
             <>
               <p className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">

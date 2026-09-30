@@ -1,16 +1,17 @@
 @import "tailwindcss";
 
-/* Design tokens — "A summer day at the club." Editors never change these. */
+/* Design tokens — "Bright pool day." Editors never change these. */
 @theme {
-  --color-pool: #0ea5e9;
-  --color-pool-text: #0369a1; /* pool blue darkened to pass AA as text on sand */
-  --color-deep: #0c4a6e;
-  --color-sun: #facc15;
-  --color-coral: #f97316;
-  --color-coral-text: #c2410c; /* coral darkened to pass AA as text and behind white text */
+  --color-pool: #06b6d4; /* turquoise, for accents and tints */
+  --color-pool-text: #0e7490; /* turquoise darkened to pass AA as text on white and foam */
+  --color-lagoon: #0e7490; /* colored surfaces with white text (hero, page headers) */
+  --color-deep: #164e63; /* headings, body text, footer */
+  --color-sun: #fde047;
+  --color-coral: #fb7185; /* pink-coral accents */
+  --color-coral-text: #be123c; /* coral darkened to pass AA as text and behind white text */
   --color-alert: #dc2626; /* alerts only */
   --color-grass: #16a34a;
-  --color-sand: #fff7ed;
+  --color-foam: #f5fdff; /* page background: almost white with a hint of pool */
 
   --font-display: "Nunito", ui-rounded, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
@@ -19,12 +20,12 @@
   --text-base: 1.0625rem;
   --text-base--line-height: 1.6;
 
-  --shadow-soft: 0 1px 2px rgb(12 74 110 / 0.06), 0 8px 24px -8px rgb(12 74 110 / 0.18);
+  --shadow-soft: 0 1px 2px rgb(22 78 99 / 0.06), 0 8px 24px -8px rgb(22 78 99 / 0.16);
 }
 
 @layer base {
   html {
-    @apply bg-sand text-deep;
+    @apply bg-foam text-deep;
     scroll-behavior: smooth;
   }
 
