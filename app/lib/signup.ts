@@ -1,7 +1,9 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import { getDb } from "../../db/client";
 import { emailSignups } from "../../db/schema";
+import { sendToGoogle } from "./gmail-sync";
 
 export const signupSchema = z.object({
   // Trim before checking so a stray space from autofill isn't an error.
@@ -20,7 +22,12 @@ export type SignupResult = { ok: true } | { ok: false; error: string };
  * Saves an address for club news. Signing up twice is fine and says the same
  * thing, so the form never reveals who is already on the list.
  */
-export async function signUp(d1: D1Database, form: FormData, now = new Date()) {
+export async function signUp(
+  env: Pick<Env, "DB" | "SIGNUP_WEBHOOK_URL" | "SIGNUP_WEBHOOK_SECRET">,
+  form: FormData,
+  now = new Date(),
+  fetcher: typeof fetch = fetch,
+) {
   const parsed = signupSchema.safeParse({
     email: String(form.get("email") ?? ""),
     website: String(form.get("website") ?? ""),
@@ -33,9 +40,18 @@ export async function signUp(d1: D1Database, form: FormData, now = new Date()) {
       : ({ ok: false, error: parsed.error.issues[0]!.message } as const);
   }
 
-  await getDb(d1)
+  const db = getDb(env.DB);
+  await db
     .insert(emailSignups)
     .values({ email: parsed.data.email, createdAt: now })
     .onConflictDoNothing();
+
+  // Pass it on to Google now; if that fails the hourly cron retries.
+  if (await sendToGoogle(env, parsed.data.email, now, fetcher)) {
+    await db
+      .update(emailSignups)
+      .set({ syncedAt: now })
+      .where(eq(emailSignups.email, parsed.data.email));
+  }
   return { ok: true } as const;
 }

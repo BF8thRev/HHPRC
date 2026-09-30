@@ -1,12 +1,18 @@
 import { Card, PageHeader, Section, TextLink } from "../components/ui";
-import { club, documents, rules } from "../content/sample";
+import { club, documents } from "../content/sample";
+import { getContent } from "../lib/content";
 import type { Route } from "./+types/rules";
 
 export function meta(_: Route.MetaArgs) {
   return [{ title: `Club rules | ${club.shortName}` }];
 }
 
-export default function Rules() {
+export async function loader({ context }: Route.LoaderArgs) {
+  return { rules: await getContent(context.cloudflare.env.DB, "rules") };
+}
+
+export default function Rules({ loaderData }: Route.ComponentProps) {
+  const { rules } = loaderData;
   return (
     <>
       <PageHeader

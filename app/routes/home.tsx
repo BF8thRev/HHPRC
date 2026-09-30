@@ -5,17 +5,7 @@ import { SignupForm } from "../components/SignupForm";
 import { StatusBadge } from "../components/StatusBadge";
 import { ArrowIcon, CalendarIcon, ClockIcon, MapPinIcon } from "../components/icons";
 import { Card, DateTile, Section, TextLink, Waves } from "../components/ui";
-import {
-  amenities,
-  announcements,
-  club,
-  events,
-  hoursNotes,
-  hoursSchedules,
-  membersMeeting,
-  milestones,
-  season,
-} from "../content/sample";
+import { amenities, club, hoursNotes, hoursSchedules, milestones, season } from "../content/sample";
 import {
   clubDate,
   clubInstant,
@@ -24,6 +14,7 @@ import {
   formatDay,
   formatShortDay,
 } from "../lib/dates";
+import { getContent } from "../lib/content";
 import { poolStatus } from "../lib/pool-status";
 import { signUp } from "../lib/signup";
 import type { Route } from "./+types/home";
@@ -39,16 +30,23 @@ export function meta(_: Route.MetaArgs) {
 }
 
 export async function action({ request, context }: Route.ActionArgs) {
-  return signUp(context.cloudflare.env.DB, await request.formData());
+  return signUp(context.cloudflare.env, await request.formData());
 }
 
 // Status and dates are worked out on the server in club time, so every
 // visitor sees the same answer and the page doesn't flicker on load.
-export function loader() {
+export async function loader({ context }: Route.LoaderArgs) {
+  const { DB } = context.cloudflare.env;
+  const [announcements, events, membersMeeting] = await Promise.all([
+    getContent(DB, "announcements"),
+    getContent(DB, "events"),
+    getContent(DB, "meeting"),
+  ]);
   const now = new Date();
   const today = clubDate(now);
   const opening = clubInstant(season.openingDay, season.openingTime);
   const meetingAt = new Date(membersMeeting.startsAt);
+  const meetingDay = clubDate(meetingAt); // the club's calendar day, not the UTC day
 
   return {
     serverNow: now.getTime(),
@@ -61,12 +59,22 @@ export function loader() {
       ...membersMeeting,
       when: membersMeeting.timeConfirmed
         ? formatDateTime(meetingAt)
-        : `${formatDay(membersMeeting.startsAt.slice(0, 10))}, time to be confirmed`,
-      tile: formatShortDay(membersMeeting.startsAt.slice(0, 10)),
+        : `${formatDay(meetingDay)}, time to be confirmed`,
+      tile: formatShortDay(meetingDay),
       upcoming: meetingAt >= now,
     },
     // Next three dates up front; the rest of the year folds away.
+    announcements,
     milestones: milestones
+      .map((m, i) =>
+        i === 0
+          ? {
+              ...m,
+              date: meetingDay,
+              detail: `${membersMeeting.place}${membersMeeting.timeConfirmed ? "" : ", time to be confirmed"}`,
+            }
+          : m,
+      )
       .filter((m) => m.date >= today)
       .map((m) => ({ ...m, tile: formatShortDay(m.date) })),
     upcoming: events
@@ -221,7 +229,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
 
       <Section title="News from the board">
         <ul className="grid gap-5 md:grid-cols-3">
-          {announcements.map((a) => (
+          {loaderData.announcements.map((a) => (
             <li key={a.title}>
               <Card className="flex h-full flex-col border-t-4 border-pool">
                 <h3 className="font-display text-xl font-extrabold">{a.title}</h3>
@@ -233,6 +241,22 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section title="Got an idea, a question, or something broken?">
+        <Card className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="max-w-xl">
+            Tell the board what you'd like to see at the club, ask a question, or report something
+            that needs fixing. It only takes a minute.
+          </p>
+          <Link
+            to="/contact"
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-sun px-8 font-bold text-deep shadow-sm hover:bg-yellow-300"
+          >
+            Send a note
+            <ArrowIcon />
+          </Link>
+        </Card>
       </Section>
 
       <section className="mx-auto max-w-6xl px-4 pt-14">

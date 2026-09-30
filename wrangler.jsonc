@@ -8,11 +8,22 @@
   "main": "./workers/app.ts",
   "compatibility_date": "2026-08-15",
   "compatibility_flags": ["nodejs_compat"],
+  // Hourly retry for sign-ups that didn't reach the Google Sheet. UTC is fine: nothing here depends on the club's clock.
+  "triggers": { "crons": ["0 * * * *"] },
   "observability": { "enabled": true },
   "upload_source_maps": true,
   "vars": {
     "APP_ENV": "production",
+    // The one person who can read ideas, questions and issues at /admin/inbox.
+    "FEEDBACK_OWNER_EMAIL": "huntingtonhillssrc@gmail.com",
+    // Cloudflare Access protects /board. Fill these in from Zero Trust →
+    // Access → Applications (see docs/SETUP.md). Empty = portal switched off.
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    // Local development only: pretend to be this board member. Ignored unless APP_ENV is "development".
+    "DEV_BOARD_EMAIL": "",
   },
+  "r2_buckets": [{ "binding": "DOCS", "bucket_name": "hhprc-docs" }],
   "d1_databases": [
     {
       "binding": "DB",
@@ -26,7 +37,12 @@
       "name": "hhprc-preview",
       "vars": {
         "APP_ENV": "preview",
+        "FEEDBACK_OWNER_EMAIL": "huntingtonhillssrc@gmail.com",
+        "ACCESS_TEAM_DOMAIN": "",
+        "ACCESS_AUD": "",
+        "DEV_BOARD_EMAIL": "",
       },
+      "r2_buckets": [{ "binding": "DOCS", "bucket_name": "hhprc-docs-preview" }],
       "d1_databases": [
         {
           "binding": "DB",

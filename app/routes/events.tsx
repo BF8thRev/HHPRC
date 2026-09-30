@@ -1,6 +1,7 @@
 import { CalendarIcon } from "../components/icons";
 import { Card, PageHeader, Section, TextLink } from "../components/ui";
-import { club, events, toddlerLessons } from "../content/sample";
+import { club, toddlerLessons } from "../content/sample";
+import { getContent } from "../lib/content";
 import { formatDateTime, formatDay } from "../lib/dates";
 import type { Route } from "./+types/events";
 
@@ -8,7 +9,8 @@ export function meta(_: Route.MetaArgs) {
   return [{ title: `Events and lessons | ${club.shortName}` }];
 }
 
-export function loader() {
+export async function loader({ context }: Route.LoaderArgs) {
+  const events = await getContent(context.cloudflare.env.DB, "events");
   const now = new Date();
   const upcoming = events
     .filter((e) => new Date(e.startsAt) >= now)
@@ -19,7 +21,7 @@ export function loader() {
   };
 }
 
-type Item = ReturnType<typeof loader>["events"][number];
+type Item = Awaited<ReturnType<typeof loader>>["events"][number];
 
 function EventList({ items }: { items: Item[] }) {
   if (items.length === 0) {

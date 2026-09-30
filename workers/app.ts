@@ -1,5 +1,7 @@
 import { createRequestHandler } from "react-router";
 
+import { syncSignups } from "../app/lib/gmail-sync";
+
 declare module "react-router" {
   export interface AppLoadContext {
     cloudflare: {
@@ -22,9 +24,11 @@ export default {
   // Cron Triggers fire in UTC. Jobs added in later phases must convert to
   // America/New_York themselves and handle daylight saving (schedule both
   // UTC offsets and check the local hour before doing work).
-  async scheduled(controller) {
+  async scheduled(controller, env, ctx) {
     console.log(
       `cron ${controller.cron} fired at ${new Date(controller.scheduledTime).toISOString()}`,
     );
+    // Retry any sign-ups that didn't reach the Google Sheet.
+    ctx.waitUntil(syncSignups(env));
   },
 } satisfies ExportedHandler<Env>;

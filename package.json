@@ -8,7 +8,7 @@
   },
   "scripts": {
     "postinstall": "pnpm run typegen",
-    "typegen": "wrangler types && react-router typegen",
+    "typegen": "wrangler types --strict-vars=false && react-router typegen",
     "dev": "react-router dev",
     "build": "react-router build",
     "preview": "pnpm run build && vite preview",
