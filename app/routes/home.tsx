@@ -5,7 +5,7 @@ import { SignupForm } from "../components/SignupForm";
 import { StatusBadge } from "../components/StatusBadge";
 import { ArrowIcon, CalendarIcon, ClockIcon, MapPinIcon } from "../components/icons";
 import { Card, DateTile, Section, TextLink, Waves } from "../components/ui";
-import { amenities, club, hoursNotes, hoursSchedules, milestones, season } from "../content/sample";
+import { amenities, club } from "../content/sample";
 import {
   clubDate,
   clubInstant,
@@ -15,6 +15,7 @@ import {
   formatShortDay,
 } from "../lib/dates";
 import { getContent } from "../lib/content";
+import { buildMilestones } from "../lib/milestones";
 import { poolStatus } from "../lib/pool-status";
 import { signUp } from "../lib/signup";
 import type { Route } from "./+types/home";
@@ -37,11 +38,15 @@ export async function action({ request, context }: Route.ActionArgs) {
 // visitor sees the same answer and the page doesn't flicker on load.
 export async function loader({ context }: Route.LoaderArgs) {
   const { DB } = context.cloudflare.env;
-  const [announcements, events, membersMeeting] = await Promise.all([
-    getContent(DB, "announcements"),
-    getContent(DB, "events"),
-    getContent(DB, "meeting"),
-  ]);
+  const [announcements, events, membersMeeting, season, hoursSchedules, hoursNotes] =
+    await Promise.all([
+      getContent(DB, "announcements"),
+      getContent(DB, "events"),
+      getContent(DB, "meeting"),
+      getContent(DB, "season"),
+      getContent(DB, "hours"),
+      getContent(DB, "hoursNotes"),
+    ]);
   const now = new Date();
   const today = clubDate(now);
   const opening = clubInstant(season.openingDay, season.openingTime);
@@ -65,16 +70,9 @@ export async function loader({ context }: Route.LoaderArgs) {
     },
     // Next three dates up front; the rest of the year folds away.
     announcements,
-    milestones: milestones
-      .map((m, i) =>
-        i === 0
-          ? {
-              ...m,
-              date: meetingDay,
-              detail: `${membersMeeting.place}${membersMeeting.timeConfirmed ? "" : ", time to be confirmed"}`,
-            }
-          : m,
-      )
+    seasonName: season.name,
+    weekendNote: hoursNotes.weekendLessons,
+    milestones: buildMilestones(season, hoursSchedules, membersMeeting)
       .filter((m) => m.date >= today)
       .map((m) => ({ ...m, tile: formatShortDay(m.date) })),
     upcoming: events
@@ -193,7 +191,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
         </ul>
         <p className="mt-5 flex items-center gap-2 text-slate-700">
           <ClockIcon className="size-5 shrink-0" />
-          {hoursNotes.weekendLessons}
+          {loaderData.weekendNote}
         </p>
       </Section>
 
@@ -318,6 +316,7 @@ function Hero({
   status,
   openingDay,
   closingDay,
+  seasonName,
 }: Route.ComponentProps["loaderData"]) {
   return (
     <section className="relative overflow-hidden bg-lagoon text-white">
@@ -371,7 +370,7 @@ function Hero({
             </div>
           )}
           <p className="mt-4 text-sky-50">
-            The {season.name} season runs {openingDay} through {closingDay}.
+            The {seasonName} season runs {openingDay} through {closingDay}.
           </p>
           <p className="mt-1">
             <Link

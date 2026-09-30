@@ -1,5 +1,6 @@
 import { Card, PageHeader, Section, TextLink } from "../components/ui";
-import { club, season } from "../content/sample";
+import { club } from "../content/sample";
+import { getContent } from "../lib/content";
 import { formatDay } from "../lib/dates";
 import { formatCents } from "../lib/money";
 import type { Route } from "./+types/dues";
@@ -8,8 +9,11 @@ export function meta(_: Route.MetaArgs) {
   return [{ title: `Club dues | ${club.shortName}` }];
 }
 
-export function loader() {
+export async function loader({ context }: Route.LoaderArgs) {
+  const season = await getContent(context.cloudflare.env.DB, "season");
   return {
+    seasonName: season.name,
+    statementsMailed: season.statementsMailed,
     amount: formatCents(season.duesCents),
     lateFee: formatCents(season.lateFeeCents),
     dueOn: formatDay(season.duesDueOn),
@@ -17,13 +21,13 @@ export function loader() {
 }
 
 export default function Dues({ loaderData }: Route.ComponentProps) {
-  const { amount, lateFee, dueOn } = loaderData;
+  const { amount, lateFee, dueOn, seasonName, statementsMailed } = loaderData;
   const { address } = club;
   return (
     <>
       <PageHeader
         title="Club dues"
-        intro={`${season.name} dues are ${amount} per household, due ${dueOn}.`}
+        intro={`${seasonName} dues are ${amount} per household, due ${dueOn}.`}
         image="/images/tennis.webp"
       />
 
@@ -43,7 +47,7 @@ export default function Dues({ loaderData }: Route.ComponentProps) {
           </Card>
         </div>
         <p className="mt-4">
-          All new and existing members pay dues. Statements are mailed in {season.statementsMailed}.
+          All new and existing members pay dues. Statements are mailed in {statementsMailed}.
         </p>
       </Section>
 

@@ -3,7 +3,15 @@
 // against these schemas when it is written and again when it is read.
 import { z } from "zod";
 
-import { announcements, events, membersMeeting, rules } from "./sample";
+import {
+  announcements,
+  events,
+  hoursNotes,
+  hoursSchedules,
+  membersMeeting,
+  rules,
+  season,
+} from "./sample";
 
 const text = (max: number, what: string) =>
   z.string().trim().min(1, `Add ${what}.`).max(max, `Keep ${what} under ${max} characters.`);
@@ -46,12 +54,70 @@ export const ruleSectionSchema = z.object({
   items: z.array(text(300, "the rule")).min(1).max(20),
 });
 
+const date = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Pick a date.")
+  .refine((v) => !Number.isNaN(Date.parse(`${v}T00:00:00Z`)), "Pick a real date.");
+const clock = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a time like 12:00.");
+// Dues and fees are whole cents, so $825 is 82500. Capped at $10,000 to catch typos.
+const cents = z.number().int("Use dollars and cents.").min(0).max(1_000_000, "That's too large.");
+
+/** The current season: dates and dues. Stored in the seasons table. */
+export const seasonSchema = z
+  .object({
+    name: text(20, "a season name"),
+    openingDay: date,
+    openingTime: clock,
+    closingDay: date,
+    duesCents: cents,
+    duesDueOn: date,
+    lateFeeCents: cents,
+    statementsMailed: text(20, "the month statements are mailed"),
+  })
+  .refine((s) => s.closingDay >= s.openingDay, {
+    message: "The last day can't be before opening day.",
+    path: ["closingDay"],
+  });
+
+const dayHoursSchema = z
+  .object({ weekday: z.number().int().min(0).max(6), open: clock, close: clock })
+  .refine((d) => d.close > d.open, "Closing time must be after opening time.");
+
+/** One run of dates with the same weekly hours. Stored in the hours_schedules table. */
+export const scheduleSchema = z
+  .object({
+    label: text(60, "a name, like Full season"),
+    startsOn: date,
+    endsOn: date,
+    days: z.array(dayHoursSchema).max(7),
+  })
+  .refine((s) => s.endsOn >= s.startsOn, {
+    message: "A run of hours can't end before it starts.",
+    path: ["endsOn"],
+  })
+  .refine((s) => new Set(s.days.map((d) => d.weekday)).size === s.days.length, {
+    message: "Each weekday can only be listed once.",
+    path: ["days"],
+  });
+
+export const hoursNotesSchema = z.object({
+  lapLanes: text(300, "a note about lap lanes"),
+  weekendLessons: text(300, "a note about weekend lessons"),
+  weather: text(300, "a note about weather"),
+});
+
 export const sections = {
   announcements: z.array(announcementSchema).max(8),
   events: z.array(eventSchema).max(60),
+  hours: z.array(scheduleSchema).min(1, "Add at least one set of hours.").max(8),
+  hoursNotes: hoursNotesSchema,
+  season: seasonSchema,
   meeting: meetingSchema,
   rules: z.array(ruleSectionSchema).max(12),
 } as const;
+
+/** Sections kept in their own tables (seasons, hours_schedules) instead of site_content. */
+export const tableKeys = ["season", "hours"] as const;
 
 export type SectionKey = keyof typeof sections;
 export type Content = { [K in SectionKey]: z.infer<(typeof sections)[K]> };
@@ -62,6 +128,9 @@ export const isSectionKey = (key: string): key is SectionKey => key in sections;
 export const defaults: Content = {
   announcements,
   events,
+  hours: hoursSchedules,
+  hoursNotes,
+  season,
   meeting: membersMeeting,
   rules,
 };

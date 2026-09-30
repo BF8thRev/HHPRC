@@ -36,6 +36,8 @@ export async function action({ request, context, params }: Route.ActionArgs) {
   const form = await request.formData();
 
   if (form.get("intent") === "reset") {
+    if (!specs[key].resettable)
+      return { ok: false as const, message: "That part can't be reset. Edit the values instead." };
     await resetContent(env.DB, key);
     return { ok: true as const, message: "Back to the starter text." };
   }
@@ -47,6 +49,8 @@ export async function action({ request, context, params }: Route.ActionArgs) {
     ? { ok: true as const, message: "Saved. The site is updated." }
     : { ok: false as const, message: saved.error };
 }
+
+const isDayField = (f: Field) => /^d\d[oc]$/.test(f.name);
 
 const inputClass =
   "mt-1 w-full rounded-2xl border-2 border-deep/20 bg-white px-4 py-2 focus:border-pool focus:outline-none";
@@ -101,7 +105,8 @@ function FieldInput({
         <input
           id={id}
           name={name}
-          type={field.type}
+          type={field.type === "money" ? "text" : field.type}
+          inputMode={field.type === "money" ? "decimal" : undefined}
           defaultValue={value}
           placeholder={field.placeholder}
           aria-describedby={field.hint ? `${id}-hint` : undefined}
@@ -148,15 +153,35 @@ export default function AdminEdit({ loaderData, actionData }: Route.ComponentPro
                 {!row.title && spec.shape === "list" && " (new)"}
               </h3>
               {row.id && <input type="hidden" name={`${i}.id`} value={row.id} />}
-              {spec.fields.map((f) => (
-                <FieldInput
-                  key={f.name}
-                  field={f}
-                  id={`${key}-${i}-${f.name}`}
-                  name={`${i}.${f.name}`}
-                  value={row[f.name] ?? ""}
-                />
-              ))}
+              {spec.fields
+                .filter((f) => !isDayField(f))
+                .map((f) => (
+                  <FieldInput
+                    key={f.name}
+                    field={f}
+                    id={`${key}-${i}-${f.name}`}
+                    name={`${i}.${f.name}`}
+                    value={row[f.name] ?? ""}
+                  />
+                ))}
+              {spec.fields.some(isDayField) && (
+                <fieldset>
+                  <legend className="font-semibold">
+                    Hours each day (leave both empty if the pool is closed)
+                  </legend>
+                  <div className="mt-2 grid grid-cols-2 gap-4">
+                    {spec.fields.filter(isDayField).map((f) => (
+                      <FieldInput
+                        key={f.name}
+                        field={f}
+                        id={`${key}-${i}-${f.name}`}
+                        name={`${i}.${f.name}`}
+                        value={row[f.name] ?? ""}
+                      />
+                    ))}
+                  </div>
+                </fieldset>
+              )}
             </Card>
           ))}
           <button
@@ -169,24 +194,26 @@ export default function AdminEdit({ loaderData, actionData }: Route.ComponentPro
           </button>
         </Form>
 
-        <Form
-          reloadDocument
-          method="post"
-          className="mt-8"
-          onSubmit={(e) => {
-            if (!confirm("Throw away every change to this part and go back to the starter text?"))
-              e.preventDefault();
-          }}
-        >
-          <button
-            type="submit"
-            name="intent"
-            value="reset"
-            className="min-h-11 rounded-full px-4 font-semibold text-alert underline underline-offset-4 hover:bg-red-50"
+        {spec.resettable && (
+          <Form
+            reloadDocument
+            method="post"
+            className="mt-8"
+            onSubmit={(e) => {
+              if (!confirm("Throw away every change to this part and go back to the starter text?"))
+                e.preventDefault();
+            }}
           >
-            Undo all my changes here
-          </button>
-        </Form>
+            <button
+              type="submit"
+              name="intent"
+              value="reset"
+              className="min-h-11 rounded-full px-4 font-semibold text-alert underline underline-offset-4 hover:bg-red-50"
+            >
+              Undo all my changes here
+            </button>
+          </Form>
+        )}
       </Section>
     </>
   );
