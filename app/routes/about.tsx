@@ -1,6 +1,7 @@
 import { FileIcon, MailIcon, MapPinIcon } from "../components/icons";
 import { Card, PageHeader, Section, TextLink } from "../components/ui";
 import { board, club, documents } from "../content/sample";
+import { ALLOWED_TYPES, documentHref, listDocuments } from "../lib/documents";
 import type { Route } from "./+types/about";
 
 export function meta(_: Route.MetaArgs) {
@@ -13,7 +14,22 @@ const initials = (name: string) =>
     .map((part) => part[0])
     .join("");
 
-export default function About() {
+// Board uploads win; until there are any, link the files on the old site.
+export async function loader({ context }: Route.LoaderArgs) {
+  const uploaded = await listDocuments(context.cloudflare.env.DB);
+  return {
+    documents:
+      uploaded.length > 0
+        ? uploaded.map((d) => ({
+            title: d.title,
+            href: documentHref(d),
+            kind: ALLOWED_TYPES[d.contentType] ?? "File",
+          }))
+        : documents,
+  };
+}
+
+export default function About({ loaderData }: Route.ComponentProps) {
   const { address } = club;
   return (
     <>
@@ -95,7 +111,7 @@ export default function About() {
 
       <Section title="Member documents" id="documents">
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {documents.map((doc) => (
+          {loaderData.documents.map((doc) => (
             <li key={doc.href}>
               <a
                 href={doc.href}

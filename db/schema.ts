@@ -15,3 +15,16 @@ export const emailSignups = sqliteTable("email_signups", {
   email: text("email").primaryKey(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 });
+
+// Files the board uploads from /board (rules, letters, forms, menus). The file
+// itself lives in R2 under `key`; this row is what the site lists.
+export const documents = sqliteTable("documents", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  key: text("key").notNull(),
+  filename: text("filename").notNull(),
+  contentType: text("content_type").notNull(),
+  size: integer("size").notNull(),
+  uploadedBy: text("uploaded_by").notNull(),
+  uploadedAt: integer("uploaded_at", { mode: "timestamp" }).notNull(),
+});

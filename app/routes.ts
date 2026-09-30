@@ -10,4 +10,6 @@ export default [
   route("login", "routes/login.tsx"),
   route("healthz", "routes/healthz.ts"),
   route("meeting.ics", "routes/meeting-ics.ts"),
+  route("board", "routes/board.tsx"),
+  route("files/:id/:filename", "routes/files.ts"),
 ] satisfies RouteConfig;
