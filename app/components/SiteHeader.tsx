@@ -76,7 +76,7 @@ export function SiteHeader() {
 
         {/* Phone menu: works without JavaScript. */}
         <details ref={menu} className="group relative lg:hidden">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-full bg-deep px-4 font-semibold text-white [&::-webkit-details-marker]:hidden">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 rounded-full bg-lagoon px-4 font-semibold text-white [&::-webkit-details-marker]:hidden">
             <MenuIcon className="size-5" />
             Menu
           </summary>
@@ -91,7 +91,7 @@ export function SiteHeader() {
                   to={link.to}
                   end
                   className={({ isActive }) =>
-                    `flex items-center rounded-2xl px-4 font-semibold hover:bg-sand ${isActive ? "bg-pool/15" : ""}`
+                    `flex items-center rounded-2xl px-4 font-semibold hover:bg-foam ${isActive ? "bg-pool/15" : ""}`
                   }
                 >
                   {link.label}

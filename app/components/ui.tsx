@@ -14,7 +14,7 @@ export function PageHeader({
   image?: string;
 }) {
   return (
-    <div className="relative overflow-hidden bg-deep text-white">
+    <div className="relative overflow-hidden bg-lagoon text-white">
       {image && (
         <img
           src={image}
@@ -23,7 +23,7 @@ export function PageHeader({
           decoding="async"
         />
       )}
-      <div className="absolute inset-0 bg-gradient-to-r from-deep/85 via-deep/60 to-deep/10" />
+      <div className="absolute inset-0 bg-gradient-to-r from-lagoon/95 via-lagoon/70 to-lagoon/15" />
       <div className="relative mx-auto max-w-6xl px-4 pt-12 pb-20 sm:pt-16">
         <h1 className="font-display text-4xl font-extrabold sm:text-5xl">{title}</h1>
         {intro && <p className="mt-3 max-w-2xl text-lg text-sky-50">{intro}</p>}
@@ -124,7 +124,7 @@ export function DateTile({
   );
 }
 
-export function Waves({ className = "text-sand" }: { className?: string }) {
+export function Waves({ className = "text-foam" }: { className?: string }) {
   return (
     <svg
       aria-hidden
@@ -133,7 +133,7 @@ export function Waves({ className = "text-sand" }: { className?: string }) {
       preserveAspectRatio="none"
     >
       <path
-        fill="#0EA5E9"
+        fill="#22D3EE"
         opacity="0.35"
         d="M0 40c120-20 240-20 360 0s240 20 360 0 240-20 360 0 240 20 360 0v40H0Z"
       />

@@ -44,7 +44,7 @@ A warm, family-friendly website for a neighborhood pool club of 252 homes: clear
 
 ## Design and copy
 
-- Theme: "A summer day at the club." Pool blue #0EA5E9, deep water #0C4A6E, sunshine #FACC15, coral #F97316, lifeguard red #DC2626 (alerts only), grass green #16A34A, sand #FFF7ED.
+- Theme: "Bright pool day" (chosen by the owner, September 2026). Turquoise #06B6D4 (accents), lagoon #0E7490 (colored surfaces and link text), deep water #164E63 (text, footer), sunshine #FDE047, pink-coral #FB7185 (text shade #BE123C), lifeguard red #DC2626 (alerts only), grass green #16A34A, foam #F5FDFF (page background). Tokens live in `app/app.css`.
 - Nunito/Quicksand headings, Inter body, 17px minimum body text, WCAG AA, 44px tap targets, never color alone for status.
 - Phone first (380px). One primary button per screen.
 - Copy is warm and plain: lead with the fact, dates as weekday + month + day + time, no ALL CAPS, every announcement ends with the next step.
