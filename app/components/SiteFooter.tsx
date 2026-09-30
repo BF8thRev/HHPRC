@@ -4,11 +4,13 @@ import { club } from "../content/sample";
 import { navLinks } from "./SiteHeader";
 import { WaveIcon } from "./icons";
 
+const footerLink = "inline-flex min-h-11 items-center underline underline-offset-4 hover:text-sun";
+
 export function SiteFooter() {
   const { address } = club;
   return (
-    <footer className="mt-16 bg-deep text-white">
-      <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 sm:grid-cols-3">
+    <footer className="mt-20 bg-deep text-white">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-3">
         <div>
           <p className="flex items-center gap-2 font-display text-lg font-extrabold">
             <WaveIcon className="size-6 text-sun" />
@@ -31,15 +33,20 @@ export function SiteFooter() {
 
         <div>
           <h2 className="font-display font-bold text-sun">Get in touch</h2>
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-1">
             <li>
-              <a className="underline underline-offset-4" href={`mailto:${club.email}`}>
+              <a className={footerLink} href={`mailto:${club.email}`}>
                 {club.email}
               </a>
             </li>
             <li>
-              <a className="underline underline-offset-4" href={club.facebookGroup}>
+              <a className={footerLink} href={club.facebookGroup}>
                 Neighbors' Facebook group
+              </a>
+            </li>
+            <li>
+              <a className={footerLink} href={club.jobApplication}>
+                Summer jobs
               </a>
             </li>
           </ul>
@@ -47,10 +54,13 @@ export function SiteFooter() {
       </div>
 
       <nav aria-label="Footer" className="border-t border-white/15">
-        <ul className="mx-auto flex max-w-5xl flex-wrap gap-x-2 px-4 py-3">
-          {navLinks.map((link) => (
+        <ul className="mx-auto flex max-w-6xl flex-wrap gap-x-2 px-4 py-3">
+          {[...navLinks, { to: "/login", label: "Member login" }].map((link) => (
             <li key={link.to}>
-              <Link to={link.to} className="flex items-center px-2 text-sky-100 hover:text-white">
+              <Link
+                to={link.to}
+                className="flex min-h-11 items-center px-2 text-sky-100 hover:text-white"
+              >
                 {link.label}
               </Link>
             </li>

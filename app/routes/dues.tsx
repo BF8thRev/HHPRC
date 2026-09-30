@@ -24,6 +24,7 @@ export default function Dues({ loaderData }: Route.ComponentProps) {
       <PageHeader
         title="Club dues"
         intro={`${season.name} dues are ${amount} per household, due ${dueOn}.`}
+        image="/images/tennis.webp"
       />
 
       <Section title="The details">
@@ -47,13 +48,22 @@ export default function Dues({ loaderData }: Route.ComponentProps) {
       </Section>
 
       <Section title="Ways to pay">
-        <ul className="grid gap-4 sm:grid-cols-2">
+        <ul className="grid gap-4 md:grid-cols-3">
           <li>
             <Card className="h-full">
-              <h3 className="font-display text-lg font-extrabold">Online</h3>
+              <h3 className="font-display text-lg font-extrabold">Zelle</h3>
               <p className="mt-2">
-                Soon you'll pay by bank transfer or card from your household login, and see your
-                receipt right away.
+                Send {amount} to {club.email}. Check your bank's daily Zelle limit first. After{" "}
+                {dueOn}, include the {lateFee} late fee.
+              </p>
+            </Card>
+          </li>
+          <li>
+            <Card className="h-full">
+              <h3 className="font-display text-lg font-extrabold">Card or bank, online</h3>
+              <p className="mt-2">
+                Coming soon: pay by bank transfer or card from your household login and get your
+                receipt right away. Card payments include a processing fee.
               </p>
             </Card>
           </li>

@@ -7,6 +7,7 @@
   --color-deep: #0c4a6e;
   --color-sun: #facc15;
   --color-coral: #f97316;
+  --color-coral-text: #c2410c; /* coral darkened to pass AA as text and behind white text */
   --color-alert: #dc2626; /* alerts only */
   --color-grass: #16a34a;
   --color-sand: #fff7ed;
@@ -17,11 +18,20 @@
   /* 17px minimum body text */
   --text-base: 1.0625rem;
   --text-base--line-height: 1.6;
+
+  --shadow-soft: 0 1px 2px rgb(12 74 110 / 0.06), 0 8px 24px -8px rgb(12 74 110 / 0.18);
 }
 
 @layer base {
   html {
     @apply bg-sand text-deep;
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 
   body {
