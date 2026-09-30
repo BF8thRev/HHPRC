@@ -55,10 +55,16 @@ export function SiteFooter() {
 
       <nav aria-label="Footer" className="border-t border-white/15">
         <ul className="mx-auto flex max-w-6xl flex-wrap gap-x-2 px-4 py-3">
-          {[...navLinks, { to: "/login", label: "Member login" }].map((link) => (
+          {[
+            ...navLinks,
+            { to: "/login", label: "Member login" },
+            { to: "/board", label: "Board login" },
+          ].map((link) => (
             <li key={link.to}>
               <Link
                 to={link.to}
+                // Board pages sit behind Cloudflare Access, which needs a full page load.
+                reloadDocument={link.to === "/board"}
                 className="flex min-h-11 items-center px-2 text-sky-100 hover:text-white"
               >
                 {link.label}

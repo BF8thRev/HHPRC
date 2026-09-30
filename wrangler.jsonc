@@ -12,7 +12,14 @@
   "upload_source_maps": true,
   "vars": {
     "APP_ENV": "production",
+    // Cloudflare Access protects /board. Fill these in from Zero Trust →
+    // Access → Applications (see docs/SETUP.md). Empty = portal switched off.
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
+    // Local development only: pretend to be this board member. Ignored unless APP_ENV is "development".
+    "DEV_BOARD_EMAIL": "",
   },
+  "r2_buckets": [{ "binding": "DOCS", "bucket_name": "hhprc-docs" }],
   "d1_databases": [
     {
       "binding": "DB",
@@ -26,7 +33,11 @@
       "name": "hhprc-preview",
       "vars": {
         "APP_ENV": "preview",
+        "ACCESS_TEAM_DOMAIN": "",
+        "ACCESS_AUD": "",
+        "DEV_BOARD_EMAIL": "",
       },
+      "r2_buckets": [{ "binding": "DOCS", "bucket_name": "hhprc-docs-preview" }],
       "d1_databases": [
         {
           "binding": "DB",
