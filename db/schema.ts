@@ -14,6 +14,8 @@ export const appMeta = sqliteTable("app_meta", {
 export const emailSignups = sqliteTable("email_signups", {
   email: text("email").primaryKey(),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  // Set once the address has been passed on to the club's Google Sheet. Null means "still to send".
+  syncedAt: integer("synced_at", { mode: "timestamp" }),
 });
 
 // Files the board uploads from /board (rules, letters, forms, menus). The file
@@ -27,4 +29,24 @@ export const documents = sqliteTable("documents", {
   size: integer("size").notNull(),
   uploadedBy: text("uploaded_by").notNull(),
   uploadedAt: integer("uploaded_at", { mode: "timestamp" }).notNull(),
+});
+
+// Content the board edits in /admin: one JSON value per section, validated against
+// app/content/blocks.ts on the way in and on the way out. Missing rows fall back to sample.ts.
+export const siteContent = sqliteTable("site_content", {
+  key: text("key").primaryKey(),
+  json: text("json").notNull(),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+  updatedBy: text("updated_by").notNull(),
+});
+
+// Ideas, questions and issues from the public form. Only the feedback owner can read these.
+export const feedback = sqliteTable("feedback", {
+  id: text("id").primaryKey(),
+  kind: text("kind").notNull(), // idea | question | issue
+  message: text("message").notNull(),
+  name: text("name"),
+  email: text("email"),
+  createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+  handledAt: integer("handled_at", { mode: "timestamp" }),
 });

@@ -39,8 +39,9 @@ stored in R2.
 2. **Sign-in.** Open **Zero Trust**. The first time, pick a team name (for example `hhprc`) and the
    Free plan. Then go to **Access → Applications → Add an application → Self-hosted**:
    - Application name: `HHPRC board portal`
-   - Public hostname: `hhprc.hhprc.workers.dev` with path `board`. When `hhprc.club` is live, add
-     `hhprc.club` with path `board` too. Don't protect `/files`; uploaded documents are public.
+   - Public hostname: `hhprc.hhprc.workers.dev` with path `board`, and a second public hostname
+     entry with path `admin` (the site editor and the private inbox). When `hhprc.club` is live, add
+     both paths for `hhprc.club` too. Don't protect `/files`; uploaded documents are public.
    - Policy: **Allow**, with a rule for **Emails** listing each board member's address.
    - Login method: **One-time PIN**.
 3. **Tell the site.** Copy the application's **Application Audience (AUD) Tag** from its overview
@@ -57,3 +58,10 @@ Locally, `DEV_BOARD_EMAIL` in `.dev.vars` stands in for sign-in. It is ignored e
 ## Custom domain
 
 When ready to go live: Workers & Pages → hhprc → Settings → Domains & Routes → add `hhprc.club`.
+
+## Google Sheet sign-ups and the private inbox
+
+- Sign-ups to the club's Google Sheet: follow `docs/GMAIL-SIGNUPS.md`, then set the two secrets it names.
+- The private ideas/questions inbox belongs to `FEEDBACK_OWNER_EMAIL` in `wrangler.jsonc`. That address must also be on the Access policy's email list.
+- Board members sign in with an emailed code. See `docs/ADMIN-GUIDE.md`.
+- Apply the new database migration before deploying: `pnpm db:migrate:prod`.

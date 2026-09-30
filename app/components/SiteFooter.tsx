@@ -57,8 +57,9 @@ export function SiteFooter() {
         <ul className="mx-auto flex max-w-6xl flex-wrap gap-x-2 px-4 py-3">
           {[
             ...navLinks,
+            { to: "/contact", label: "Ideas & questions" },
             { to: "/login", label: "Member login" },
-            { to: "/board", label: "Board login" },
+            { to: "/admin", label: "Board login" },
           ].map((link) => (
             <li key={link.to}>
               <Link

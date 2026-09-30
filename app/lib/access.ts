@@ -110,3 +110,19 @@ export async function requireBoard(
   if (!email) throw new Response("Board members only.", { status: 403 });
   return email;
 }
+
+/**
+ * Ideas, questions and issues are private to one person (FEEDBACK_OWNER_EMAIL).
+ * Other board members are signed in but still get a 403 here.
+ */
+export async function requireFeedbackOwner(
+  request: Request,
+  env: BoardEnv & Pick<Env, "FEEDBACK_OWNER_EMAIL">,
+  getKeys: KeyFetcher = fetchAccessKeys,
+): Promise<string> {
+  const email = await requireBoard(request, env, getKeys);
+  if (!env.FEEDBACK_OWNER_EMAIL || email !== env.FEEDBACK_OWNER_EMAIL.trim().toLowerCase()) {
+    throw new Response("This inbox is private.", { status: 403 });
+  }
+  return email;
+}
