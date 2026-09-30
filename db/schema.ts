@@ -50,3 +50,32 @@ export const feedback = sqliteTable("feedback", {
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   handledAt: integer("handled_at", { mode: "timestamp" }),
 });
+
+// One row per club season. The newest opening day is the "current" season. Dues
+// amounts and dates live here, never in code. Money is stored in integer cents.
+export const seasons = sqliteTable("seasons", {
+  name: text("name").primaryKey(), // "2027"
+  openingDay: text("opening_day").notNull(), // YYYY-MM-DD, club time
+  openingTime: text("opening_time").notNull(), // HH:MM, club time
+  closingDay: text("closing_day").notNull(),
+  duesCents: integer("dues_cents").notNull(),
+  duesDueOn: text("dues_due_on").notNull(),
+  lateFeeCents: integer("late_fee_cents").notNull(),
+  statementsMailed: text("statements_mailed").notNull(), // month name
+  updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+  updatedBy: text("updated_by").notNull(),
+});
+
+// Weekly pool hours for a run of dates in a season. `days_json` holds
+// [{ weekday: 0-6, open: "12:00", close: "19:00" }]; a weekday with no entry is closed.
+export const hoursSchedules = sqliteTable("hours_schedules", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  seasonName: text("season_name")
+    .notNull()
+    .references(() => seasons.name, { onDelete: "cascade" }),
+  position: integer("position").notNull(),
+  label: text("label").notNull(),
+  startsOn: text("starts_on").notNull(),
+  endsOn: text("ends_on").notNull(),
+  daysJson: text("days_json").notNull(),
+});

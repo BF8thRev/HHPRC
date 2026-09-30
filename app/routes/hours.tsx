@@ -1,5 +1,6 @@
 import { Card, PageHeader, Section } from "../components/ui";
-import { club, hoursNotes, hoursSchedules, season } from "../content/sample";
+import { club } from "../content/sample";
+import { getContent } from "../lib/content";
 import { formatDay, formatTimeRange, weekdayOf } from "../lib/dates";
 import type { Route } from "./+types/hours";
 
@@ -23,8 +24,16 @@ function nextDay(date: string) {
   return new Date(Date.UTC(y, m - 1, d + 1)).toISOString().slice(0, 10);
 }
 
-export function loader() {
+export async function loader({ context }: Route.LoaderArgs) {
+  const { DB } = context.cloudflare.env;
+  const [season, hoursSchedules, hoursNotes] = await Promise.all([
+    getContent(DB, "season"),
+    getContent(DB, "hours"),
+    getContent(DB, "hoursNotes"),
+  ]);
   return {
+    seasonName: season.name,
+    notes: Object.values(hoursNotes),
     openingDay: formatDay(season.openingDay),
     closingDay: formatDay(season.closingDay),
     schedules: hoursSchedules.map((s) => ({
@@ -42,12 +51,12 @@ export function loader() {
 }
 
 export default function Hours({ loaderData }: Route.ComponentProps) {
-  const { openingDay, closingDay, schedules } = loaderData;
+  const { openingDay, closingDay, schedules, seasonName, notes } = loaderData;
   return (
     <>
       <PageHeader
         title="Pool hours"
-        intro={`The ${season.name} season runs ${openingDay} through ${closingDay}.`}
+        intro={`The ${seasonName} season runs ${openingDay} through ${closingDay}.`}
         image="/images/beachball.webp"
       />
       {schedules.map((s) => (
@@ -74,7 +83,7 @@ export default function Hours({ loaderData }: Route.ComponentProps) {
       ))}
       <Section title="Good to know">
         <ul className="list-disc space-y-2 pl-6">
-          {Object.values(hoursNotes).map((note) => (
+          {notes.map((note) => (
             <li key={note}>{note}</li>
           ))}
         </ul>
