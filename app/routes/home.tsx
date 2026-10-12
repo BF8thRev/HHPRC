@@ -335,8 +335,11 @@ function Hero({
       {/* Phone order: headline, countdown, then the rest. Desktop: text left, countdown right. */}
       <div className="relative mx-auto grid max-w-6xl gap-6 px-4 pt-6 pb-24 sm:pt-16 sm:pb-32 lg:grid-cols-[1fr_1.05fr] lg:gap-x-10 lg:gap-y-6">
         <div className="lg:col-start-1 lg:row-start-1 lg:self-end">
-          <p className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white/15 px-4 font-semibold ring-1 ring-white/25 backdrop-blur-sm">
-            <MapPinIcon className="size-5 text-sun" />
+          <p className="font-display text-xl leading-tight font-extrabold text-sun drop-shadow-sm sm:text-3xl">
+            {club.name}
+          </p>
+          <p className="mt-2 flex items-center gap-2 font-semibold">
+            <MapPinIcon className="size-5 shrink-0 text-sun" />
             {club.neighborhood} · Melville, NY
           </p>
           <h1 className="mt-4 max-w-2xl font-display text-4xl leading-[1.05] font-extrabold drop-shadow-sm sm:text-6xl">
@@ -385,8 +388,8 @@ function Hero({
 
         <div className="lg:col-start-1 lg:row-start-2 lg:self-start">
           <p className="max-w-xl text-lg text-sky-50 sm:text-xl">
-            First swim lessons, lazy pool afternoons and pickup games, just down the street for the{" "}
-            {club.homes} homes of {club.neighborhood}.
+            Swim lessons, lazy pool afternoons and pickup games are all just down the street for
+            the {club.homes} homes of {club.neighborhood}.
           </p>
           <p className="mt-6 hidden sm:block">
             <a
