@@ -40,7 +40,18 @@ export default function About({ loaderData }: Route.ComponentProps) {
       />
 
       <Section title="Who we are">
-        <p className="max-w-3xl text-lg">{club.about}</p>
+        <div className="grid items-center gap-6 md:grid-cols-[1fr_20rem]">
+          <p className="max-w-3xl text-lg">{club.about}</p>
+          <img
+            src="/images/neighborhood-sign.webp"
+            alt="Green neighborhood entrance sign with gold lettering reading Strathmore Hills"
+            width={960}
+            height={735}
+            loading="lazy"
+            decoding="async"
+            className="w-full rounded-3xl shadow-soft"
+          />
+        </div>
       </Section>
 
       <Section title="Your volunteer board" eyebrow="Elected by members">

@@ -108,7 +108,7 @@ export default function Events({ loaderData }: Route.ComponentProps) {
           <Card className="overflow-hidden p-0">
             <img
               src="/images/pickleball.webp"
-              alt="Two pickleball paddles and balls on a court"
+              alt="Tennis and pickleball courts surrounded by trees"
               loading="lazy"
               width={900}
               height={680}
